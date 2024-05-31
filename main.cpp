@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <sstream>
 #include <vector>
+#include <iomanip>
 
 using namespace std;
 
@@ -13,11 +14,13 @@ int main() {
     multimap<string, int> line_map;
     vector <string> urls;
 
-    ifstream file("C:\\Users\\marty\\Documents\\objektinis_isankstine\\text.txt");
+    ifstream file("../text.txt");
     if(!file) {
         cout << "Nepavyko atidaryti failo." << endl;
         return -1;
     }
+
+    ofstream output_count("word_count.txt");
 
     string line;
     int line_number = 0;
@@ -28,17 +31,29 @@ int main() {
 
         while(ss >> word) {
             word[0] = toupper(word[0]);
-            if (::ispunct(word[0])) {
-                word.erase(0);
-            } else if (::ispunct(word[word.length() - 1])) {
-                word.erase(word.length() - 1);
+
+            while (!word.empty() && ::ispunct(word.front())) {
+                word.erase(word.begin());
             }
+            while (!word.empty() && ::ispunct(word.back())) {
+                word.pop_back();
+            }
+
             word_map[word]++;
-            cout << word << " " << word_map[word] << endl;
+            output_count << word << " " << word_map[word] << endl;
 
             line_map.insert(pair<string, int> (word, line_number));
-            cout << word << " " << line_number << endl;
         }
     }
+    file.close();
+    output_count.close();
+
+    ofstream output_table("../cross-reference.txt");
+    output_table << setw(25) << ' ';
+    for(int i = 1; i <= line_number; i++) {
+        output_table << left << setw(to_string(line_number).length() + 2) << i;
+    }
+    output_table.close();
+
     return 0;
 }
