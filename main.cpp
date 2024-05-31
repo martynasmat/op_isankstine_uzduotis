@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iomanip>
 #include <set>
+#include <regex>
 
 using namespace std;
 
@@ -13,6 +14,7 @@ int main() {
     map<string, int> word_map;
     multimap<string, int> line_map;
     set<string> word_set;
+    set<string> url_set;
 
     ifstream file("../text.txt");
     if(!file) {
@@ -30,13 +32,17 @@ int main() {
         string word;
 
         while(ss >> word) {
-            word[0] = toupper(word[0]);
-
             while (!word.empty() && ::ispunct(word.front())) {
                 word.erase(word.begin());
             }
             while (!word.empty() && ::ispunct(word.back())) {
                 word.pop_back();
+            }
+
+            regex url_regex(R"(https?:\/\/[a-zA-Z0-9\.\/\-\?\=]+|www\.[a-zA-Z0-9\.\/\-\?\=]+|[a-z.]+\.[a-zA-Z0-9\.\/\-\?\=]{2,})");
+            smatch url_match;
+            if (regex_match(word, url_match, url_regex)) {
+                url_set.insert(word);
             }
 
             word_map[word]++;
@@ -77,5 +83,9 @@ int main() {
         }
     }
 
+    ofstream output_urls("../urls.txt");
+    for (const auto& url : url_set) {
+        output_urls << url << endl;
+    }
     return 0;
 }
