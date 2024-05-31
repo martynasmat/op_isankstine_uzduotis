@@ -10,6 +10,8 @@
 
 using namespace std;
 
+bool is_number(const string& str);
+
 int main() {
     map<string, int> word_map;
     multimap<string, int> line_map;
@@ -31,7 +33,7 @@ int main() {
         stringstream ss(line);
         string word;
 
-        while(ss >> word) {
+        while(ss >> word && !is_number(word)) {
             while (!word.empty() && ::ispunct(word.front())) {
                 word.erase(word.begin());
             }
@@ -88,4 +90,13 @@ int main() {
         output_urls << url << endl;
     }
     return 0;
+}
+
+bool is_number(const string& str) {
+    for(int i = 0; i < str.length(); i++) {
+        if(!isdigit(str[i]) && !::ispunct(str[i])) {
+            return false;
+        }
+    }
+    return true;
 }
